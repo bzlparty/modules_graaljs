@@ -17,3 +17,9 @@ graalnodejs.toolchain(name = "graalnodejs")
 use_repo(graalnodejs, "graalnodejs_toolchains")
 
 register_toolchains("@graalnodejs_toolchains//:all")
+
+graaljs = use_extension("@bzlparty_modules_graaljs//graaljs:extensions.bzl", "graaljs")
+graaljs.toolchain(name = "graaljs")
+use_repo(graaljs, "graaljs_toolchains")
+
+register_toolchains("@graaljs_toolchains//:all")

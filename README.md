@@ -5,6 +5,7 @@
 ## Packages
 
 - [**toolchains_graalnodejs**](/graalnodejs) Provides a `node_toolchain` for the GraalVM Node.js runtime.
+- [**rules_graaljs**](/graaljs) Rules to run applications on the GraalVM JavaScript runtime.
 
 ## Installation
 

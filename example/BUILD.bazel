@@ -1,6 +1,12 @@
 load("@aspect_rules_js//js:defs.bzl", "js_binary")
+load("//graaljs:defs.bzl", "graaljs_binary")
 
 js_binary(
     name = "hello_world",
     entry_point = "hello_world.js",
+)
+
+graaljs_binary(
+    name = "graaljs_info",
+    entry_point = "graaljs_info.js",
 )
