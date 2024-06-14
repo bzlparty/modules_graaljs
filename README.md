@@ -1,4 +1,4 @@
-# Bazel module for GraalJs
+# Bazel modules for GraalJs
 
 [![Test](https://github.com/bzlparty/modules_graaljs/actions/workflows/test.yaml/badge.svg?branch=main&event=push)](https://github.com/bzlparty/graaljs/actions/workflows/test.yaml)
 
