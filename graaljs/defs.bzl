@@ -84,7 +84,7 @@ def _graaljs_binary_impl(ctx):
     ctx.actions.write(
         output = launcher,
         content = """
-{graaljs_bin} {args} {entry_point}
+{graaljs_bin} {args} {entry_point} -- $@
       """.format(
             args = " ".join(args),
             graaljs_bin = graaljs_bin.path,
