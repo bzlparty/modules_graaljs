@@ -2,19 +2,20 @@
 
 load("//lib:vendor.bzl", "DOWNLOAD_URL", "PLATFORMS", "PLATFORMS_COMPATIBILITY")
 load(":assets.bzl", "ASSETS")
+load(":repo.bzl", "REPO_NAME")
 
 _BUILD_FILE_PARTIAL = """\
 toolchain(
     name = "{name}_{platform}_toolchain",
     toolchain = "@{name}_{platform}//:graaljs_toolchain",
     exec_compatible_with = {compatible_with},
-    toolchain_type = "@bzlparty_modules_graaljs//graaljs:toolchain_type",
+    toolchain_type = "@{repo_name}//graaljs:toolchain_type",
     visibility = ["//visibility:public"],
 )
 """
 
 _BUILD_FILE = """\
-load("@bzlparty_modules_graaljs//graaljs:toolchain.bzl", "graaljs_toolchain")
+load("@{repo_name}//graaljs:toolchain.bzl", "graaljs_toolchain")
 
 alias(name = "graaljs_bin", actual = "{graaljs_bin}")
 
@@ -54,6 +55,7 @@ def graaljs_register_toolchains(name, graaljs_version):
         build_file_content += _BUILD_FILE_PARTIAL.format(
             name = name,
             platform = platform,
+            repo_name = REPO_NAME,
             compatible_with = PLATFORMS_COMPATIBILITY[platform],
         )
 
@@ -81,6 +83,7 @@ def _graaljs_platform_toolchain_repo_impl(ctx):
 
     ctx.file("BUILD.bazel", _BUILD_FILE.format(
         graaljs_bin = graaljs_bin,
+        repo_name = REPO_NAME,
     ))
 
 graaljs_platform_toolchain_repo = repository_rule(

@@ -1,5 +1,9 @@
 "GraalJS Public API"
 
+load(":repo.bzl", "REPO_NAME")
+
+GRAALJS_TOOLCHAIN_TYPE = "@%s//graaljs:toolchain_type" % REPO_NAME
+GRAALJS_TOOLCHAINS = [GRAALJS_TOOLCHAIN_TYPE]
 _DOC = """\
 This rule runs a script on GraalJs.
 
@@ -17,6 +21,10 @@ graaljs_binary(
 
 _ATTRS = {
     "deps": attr.label_list(
+        default = [],
+        allow_files = [".js", ".mjs"],
+    ),
+    "data": attr.label_list(
         default = [],
         allow_files = True,
     ),
@@ -67,7 +75,7 @@ _ATTRS = {
 }
 
 def _graaljs_binary_impl(ctx):
-    toolchain = ctx.toolchains["@bzlparty_modules_graaljs//graaljs:toolchain_type"].graaljs_info
+    toolchain = ctx.toolchains[GRAALJS_TOOLCHAIN_TYPE].graaljs_info
     graaljs_bin = toolchain.graaljs_bin
     entry_point = ctx.files.entry_point[0]
     launcher = ctx.actions.declare_file("%s.sh" % ctx.attr.name)
@@ -75,6 +83,25 @@ def _graaljs_binary_impl(ctx):
 
     args.append("--log.js.level=%s" % ctx.attr.log_level)
     args.append("--js.ecmascript-version=%s" % ctx.attr.ecmascript_version)
+
+    runfiles = ctx.runfiles(
+        files = [graaljs_bin, entry_point] + toolchain.files + ctx.files.deps,
+    )
+
+    providers = []
+
+    if ctx.attr.testonly and ctx.configuration.coverage_enabled:
+        args.extend(["--coverage", "--coverage.Output=lcov", "--coverage.OutputFile=$COVERAGE_OUTPUT_FILE"])
+        providers = [
+            coverage_common.instrumented_files_info(
+                ctx,
+                source_attributes = ["entry_point", "data"],
+                extensions = [
+                    "mjs",
+                    "js",
+                ],
+            ),
+        ]
 
     if entry_point.basename.endswith(".mjs"):
         args.append("--module")
@@ -93,11 +120,7 @@ def _graaljs_binary_impl(ctx):
         is_executable = True,
     )
 
-    runfiles = ctx.runfiles(
-        files = [graaljs_bin, entry_point] + toolchain.files + ctx.files.deps,
-    )
-
-    return [
+    return providers + [
         DefaultInfo(
             runfiles = runfiles,
             executable = launcher,
@@ -109,7 +132,13 @@ graaljs_binary = rule(
     attrs = _ATTRS,
     doc = _DOC,
     executable = True,
-    toolchains = [
-        "@bzlparty_modules_graaljs//graaljs:toolchain_type",
-    ],
+    toolchains = GRAALJS_TOOLCHAINS,
+)
+
+graaljs_test = rule(
+    _graaljs_binary_impl,
+    attrs = _ATTRS,
+    doc = _DOC,
+    test = True,
+    toolchains = GRAALJS_TOOLCHAINS,
 )
