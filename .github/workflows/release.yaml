@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "graaljs-v*.*.*"
+      - "graalnodejs-v*.*.*"
 
 jobs:
   release:
