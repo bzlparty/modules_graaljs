@@ -9,7 +9,7 @@ RULES_ARCHIVE="${PROJECT_NAME}-${TAG}.tar.gz"
 
 build_file=$(mktemp)
 echo "package(default_visibility = [\"//visibility:public\"])" > "$build_file"
-TARGETS="$NAME lib $build_file"
+TARGETS="$NAME lib LICENSE $build_file"
 TAR_ARGS="--absolute-names --mode=644 --owner=build --group=build --transform="s,$build_file,BUILD.bazel," --transform="s,$NAME/MODULE.bazel,MODULE.bazel," --transform="s,^,$PREFIX/,""
 if [[ "$NAME" == "graaljs" ]]; then
   repo_file=$(mktemp)
